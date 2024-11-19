@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    #"adminpro",
     "corsheaders",
     "accounts",
     "board",
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "djoser",
     "django_filters",
+    
 ]
 
 MIDDLEWARE = [
@@ -61,7 +63,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "adminPro.urls"
+ROOT_URLCONF = "adminpro.urls"
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8001',
@@ -84,7 +86,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "adminPro.wsgi.application"
+WSGI_APPLICATION = "adminpro.wsgi.application"
 
 
 # Database
@@ -177,3 +179,10 @@ ADMINS = [
 ]
 
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_BEAT_SCHEDULE = {
+    'notify_customer': {
+        'task': 'core.task.notify_customer',
+        'schedule': 5,
+        'args': ['New task'],
+    }
+}
