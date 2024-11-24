@@ -1,30 +1,19 @@
-from django.urls import path
 from rest_framework_nested import routers
+from django.urls import path, include
 from . import views
 
-
+# Main router
 router = routers.DefaultRouter()
-router.register('questions', views.QuestionViewSet)
-router.register('answers', views.AnswerViewSet)
-router.register('exams', views.ExamViewSet)
 router.register('candidates', views.CandidateViewSet)
-router.register('result', views.ResultViewSet)
+router.register('exams', views.ExamViewSet)
+router.register('results', views.ResultViewSet, basename='result')
+router.register('questions', views.QuestionViewSet, basename='question')  # Add this line
 
+# Nested router for questions under exams
+exams_router = routers.NestedDefaultRouter(router, 'exams', lookup='exam')
+exams_router.register('questions', views.QuestionViewSet, basename='exam-questions')
 
-
-questions_router = routers.NestedDefaultRouter(router, 'questions', lookup='question')
-questions_router.register('answers', views.AnswerViewSet, basename='question-answers')
-
-# Nested Router for 'candidates' (added 'images')
-candidate_router = routers.NestedDefaultRouter(
-    router, 'candidates', lookup='candidate')
-candidate_router.register(
-    'images', views.CandidateImageViewSet, basename='candidate-image')
-
-# Combine all URL patterns
-urlpatterns = router.urls + questions_router.urls + candidate_router.urls
-#URLConf
-#urlpatterns = [""" 
- #   path('questions/', views.QuestionList.as_view()),
-  #  path('questions/<int:id>/', views.QuestionDetail.as_view()) """
-#]
+urlpatterns = [
+    path('', include(router.urls)),
+    path('', include(exams_router.urls)),
+]
