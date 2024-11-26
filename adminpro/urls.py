@@ -25,7 +25,7 @@ from core import views
 urlpatterns = [
     path("mails/", include('core.urls')),
     path("admin/", admin.site.urls),
-    path('exam/', include('board.urls')),
+    path('api/', include('board.urls')),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
 
