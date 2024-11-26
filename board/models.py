@@ -13,30 +13,26 @@ class TimeStampedModel(models.Model):
     An abstract base class model that provides self-updating
     'created_at' and 'modified_at' fields.
     """
-    created_at = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    modified_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     class Meta:
         abstract = True
 
 class Candidate(TimeStampedModel):
-    """
-    Model representing a candidate who can take exams.
-    """
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE,
         related_name='candidate_profile'
     )
     phone = models.CharField(max_length=20)
-    email = models.EmailField(unique=True)
     bio = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['user__first_name', 'user__last_name']
         indexes = [
-            models.Index(fields=['email']),
+            models.Index(fields=['phone']),
         ]
 
     def __str__(self):

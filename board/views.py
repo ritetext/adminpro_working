@@ -1,36 +1,41 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied  # Changed this line
-
 from .models import (
-    Candidate,
-    CandidateImage,
-    Exam,
-    Question,
-    Answer,
-    Result
-)
-from .serializers import (
-    CandidateSerializer,
-    CandidateImageSerializer,
-    ExamSerializer,
-    QuestionSerializer,
-    ResultSerializer,
-    ExamSubmissionSerializer
+    Candidate, CandidateImage, Exam, Question, Answer, Result)
+from .serializers import ( CandidateSerializer, CandidateImageSerializer,
+    ExamSerializer, QuestionSerializer, ResultSerializer, ExamSubmissionSerializer
 )
 
-class CandidateViewSet(viewsets.ModelViewSet):
+class CandidateViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """
     ViewSet for managing candidates.
     Provides CRUD operations and image listing.
     """
     queryset = Candidate.objects.all()
     serializer_class = CandidateSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    
+    @action(detail=False, methods=['GET', 'PUT'])
+    def me(self, request):
+        # Use get to retrieve the candidate for the logged-in user
+        try:
+            candidate = Candidate.objects.get(user_id=request.user.id)
+        except Candidate.DoesNotExist:
+            return Response({"detail": "Candidate not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if request.method == 'GET':
+            serializer = CandidateSerializer(candidate)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = CandidateSerializer(candidate, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -44,7 +49,6 @@ class CandidateViewSet(viewsets.ModelViewSet):
         images = CandidateImage.objects.filter(candidate=candidate)
         serializer = CandidateImageSerializer(images, many=True)
         return Response(serializer.data)
-
 class CandidateImageViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing candidate images.

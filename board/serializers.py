@@ -24,8 +24,8 @@ class CandidateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Candidate
-        fields = ['id', 'user', 'first_name', 'last_name', 'phone', 'email']
-
+        fields = ['id', 'user', 'first_name', 'last_name', 'phone'] 
+        
 # Add this new serializer to your serializers.py
 class CandidateImageSerializer(serializers.ModelSerializer):
     class Meta:

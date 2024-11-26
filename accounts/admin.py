@@ -62,7 +62,7 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Candidate)
 class CandidateAdmin(admin.ModelAdmin):
-    list_display = ('user', 'first_name', 'last_name', 'email', 
+    list_display = ('user', 'first_name', 'last_name', 'user__email',
                    'exam_count', 'avg_score', 'last_exam_date')
     list_filter = ('user__is_active', 'user__date_joined')
     search_fields = ('user__username', 'user__email', 
