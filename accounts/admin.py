@@ -17,7 +17,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('is_admin', 'is_candidate', 'is_active', 'groups')
     search_fields = ('username', 'email', 'first_name', 'last_name', 'phone_number')
     ordering = ('username',)
-    list_select_related = ['candidate']
+    list_select_related = ['candidate_profile']
     inlines = [CandidateInline]
 
     fieldsets = (

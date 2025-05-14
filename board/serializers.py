@@ -47,10 +47,27 @@ class AnswerSerializer(serializers.ModelSerializer):
 
 class QuestionSerializer(serializers.ModelSerializer):
     answers = AnswerSerializer(many=True, read_only=True)
-
+    
     class Meta:
         model = Question
-        fields = ['id', 'text', 'answers', 'created_at']
+        fields = ['id', 'exam', 'text', 'marks', 'explanation', 'answers', 'created_at']
+        read_only_fields = ['created_at']
+        
+    def create(self, validated_data):
+        # Create the question first
+        question = Question.objects.create(**validated_data)
+        
+        # Return the created question
+        return question
+        
+    def to_representation(self, instance):
+        """Format output based on request context"""
+        representation = super().to_representation(instance)
+        # Check if this is a creation response and adjust accordingly
+        if self.context.get('action') == 'create':
+            # For create responses, we might want to exclude some fields
+            representation.pop('answers', None)
+        return representation
 
 class ExamSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
